@@ -28,16 +28,18 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
+jax = [
+    "jax>=0.4",
+    "jaxlib>=0.4",
+]
+
+[dependency-groups]
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
     "numpy>=1.20",
     "ruff>=0.4",
     "mypy>=1.0",
-]
-jax = [
-    "jax>=0.4",
-    "jaxlib>=0.4",
 ]
 
 [project.urls]
