@@ -101,7 +101,7 @@ class RankMismatchError(ShapeGuardError):
         *,
         function: str | None = None,
         argument: str | None = None,
-        expected_rank: int,
+        expected_rank: int | str,
         actual_rank: int,
         expected_shape: Any,
         actual_shape: tuple[int, ...],

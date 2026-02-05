@@ -25,9 +25,20 @@ def _has_ellipsis(spec: ShapeSpec) -> bool:
     return any(s is ... or isinstance(s, _EllipsisType) for s in spec)
 
 
-def _split_ellipsis_spec(spec: ShapeSpec) -> tuple[ShapeSpec, ShapeSpec]:
+# Type alias for spec parts without ellipsis
+SpecPart = tuple[int | Dim | None, ...]
+
+
+def _filter_ellipsis(items: ShapeSpec) -> SpecPart:
+    """Filter out ellipsis from spec items."""
+    return tuple(s for s in items if not (s is ... or isinstance(s, _EllipsisType)))
+
+
+def _split_ellipsis_spec(spec: ShapeSpec) -> tuple[SpecPart, SpecPart]:
     """
     Split a spec at the ellipsis into (before, after) parts.
+
+    The returned tuples do not contain ellipsis elements.
 
     Raises ValueError if more than one ellipsis.
     """
@@ -37,10 +48,10 @@ def _split_ellipsis_spec(spec: ShapeSpec) -> tuple[ShapeSpec, ShapeSpec]:
         raise ValueError("Shape spec cannot contain more than one ellipsis")
 
     if not ellipsis_indices:
-        return spec, ()
+        return _filter_ellipsis(spec), ()
 
     idx = ellipsis_indices[0]
-    return spec[:idx], spec[idx + 1 :]
+    return _filter_ellipsis(spec[:idx]), _filter_ellipsis(spec[idx + 1 :])
 
 
 def match_shape(
@@ -105,8 +116,9 @@ def match_shape(
             bindings=ctx.format_bindings(),
         )
 
-    # Check each dimension
-    for i, spec_dim in enumerate(spec):
+    # Check each dimension (filter for type narrowing, no ellipsis present)
+    spec_dims = _filter_ellipsis(spec)
+    for i, spec_dim in enumerate(spec_dims):
         _match_dim(actual[i], spec_dim, i, actual, spec, ctx, source)
 
 

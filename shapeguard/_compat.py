@@ -80,7 +80,7 @@ def is_jax_tracing() -> bool:
     try:
         from jax._src.core import unsafe_am_i_under_a_jit
 
-        return unsafe_am_i_under_a_jit()
+        return bool(unsafe_am_i_under_a_jit())
     except ImportError:
         # JAX not installed or API changed
         return False
